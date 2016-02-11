@@ -1,6 +1,21 @@
 /**
  * Created by Gouri on 2/4/2016.
  */
+var http = require('http');
+var url = require('url');
+
+var handleRequest = function(request, response){
+    var url_parts = url.parse(request.url, true);
+    var query = url_parts.query;
+
+    var simplexValues = solutionSimplex(query.q);
+    response.end(JSON.stringify(simplexValues));
+}
+
+var server = http.createServer(handleRequest);
+
+server.listen(1228);
+
 
 var preParserFunction = function(textData){
     var objectOfEquations = {};
@@ -72,10 +87,7 @@ var parserFunction = function(objectOfEquations){
     return objectWithEqDetails;
 }
 
-//    var objectWithEqDetails = parserFunction(objectOfEquations);
-
-
-var canonicalFormParameters = function(objectWithEqDetails){
+var canonicalFormObjectParser = function(objectWithEqDetails){
 
     var goalCoefficientArray = objectWithEqDetails.goal.Parts.coefficients;
 
@@ -96,7 +108,6 @@ var canonicalFormParameters = function(objectWithEqDetails){
     return objectWithEqDetails;
 }
 
-//    var canonicalFormDetailsObject = canonicalFormParameters(objectWithEqDetails);
 
 var canonicalFormOne = function(objectWithEqDetails){
     var arrayOfArray = [];
@@ -155,8 +166,6 @@ var canonicalFormOne = function(objectWithEqDetails){
     return arrayOfArray;
 }
 
-//    var tableOne = canonicalFormOne(canonicalFormDetailsObject);
-
 var isSimplexSolved = function(table){
     var a = table[1].pop();
 
@@ -211,12 +220,11 @@ var canonicalFormTwo = function(tableOne){
     return tableOne;
 }
 
-//    var basicFeasibleSolution = canonicalFormTwo(tableOne);
 
 var solutionSimplex = function(Text){
     var objectOfEquations = preParserFunction(Text);
     var objectWithEqDetails = parserFunction(objectOfEquations);
-    var canonicalFormDetailsObject = canonicalFormParameters(objectWithEqDetails);
+    var canonicalFormDetailsObject = canonicalFormObjectParser(objectWithEqDetails);
     var tableOne = canonicalFormOne(canonicalFormDetailsObject);
     var basicFeasibleSolution = canonicalFormTwo(tableOne);
 
